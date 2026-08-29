@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manelis Studio — Coming Soon</title>
+<meta name="description" content="Manelis Studio is a jewelry atelier under construction — necklaces, charms, chains, and bundles made to become heirlooms. Coming soon.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #fbf6ef;
+    --blush-soft: #f8e9e6;
+    --sky-soft: #e6f1f5;
+    --gold: #b6893f;
+    --gold-soft: #cda863;
+    --ink: #4a4038;
+    --ink-soft: #7a6f63;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+  }
+
+  body {
+    font-family: 'Jost', 'Segoe UI', Tahoma, Geneva, sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(circle at 12% 15%, var(--sky-soft) 0%, transparent 45%),
+      radial-gradient(circle at 88% 20%, var(--blush-soft) 0%, transparent 50%),
+      radial-gradient(circle at 50% 100%, var(--sky-soft) 0%, transparent 55%),
+      var(--cream);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6vh 6vw;
+    overflow-x: hidden;
+  }
+
+  .card {
+    max-width: 640px;
+    width: 100%;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .ornament {
+    width: 56px;
+    height: 56px;
+    color: var(--gold-soft);
+    margin-bottom: 1.5rem;
+  }
+
+  .brand {
+    font-family: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+    font-weight: 600;
+    font-size: clamp(2.4rem, 7vw, 4.2rem);
+    letter-spacing: 0.02em;
+    color: var(--ink);
+    margin: 0;
+    line-height: 1.1;
+  }
+
+  .brand em {
+    font-style: italic;
+    font-weight: 500;
+    color: var(--gold);
+  }
+
+  .scallop-divider {
+    width: 220px;
+    max-width: 60vw;
+    height: 16px;
+    margin: 1.5rem 0 1.75rem;
+    background:
+      radial-gradient(circle at 10px 0, transparent 9px, var(--gold-soft) 10px) 0 0 / 20px 20px repeat-x;
+    opacity: 0.85;
+  }
+
+  .eyebrow {
+    font-family: 'Jost', sans-serif;
+    font-weight: 500;
+    font-size: 0.78rem;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin: 0 0 0.85rem;
+  }
+
+  .headline {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: clamp(1.35rem, 3.6vw, 1.85rem);
+    color: var(--ink);
+    margin: 0 0 1.1rem;
+    line-height: 1.4;
+  }
+
+  .tagline {
+    font-family: 'Jost', sans-serif;
+    font-weight: 300;
+    font-size: clamp(0.95rem, 2.4vw, 1.05rem);
+    color: var(--ink-soft);
+    line-height: 1.7;
+    max-width: 30rem;
+    margin: 0 0 2.25rem;
+  }
+
+  .tagline strong {
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .footnote {
+    font-family: 'Jost', sans-serif;
+    font-weight: 300;
+    font-size: 0.8rem;
+    letter-spacing: 0.06em;
+    color: var(--ink-soft);
+    opacity: 0.75;
+  }
+
+  @media (max-width: 420px) {
+    body { padding: 8vh 6vw; }
+    .ornament { width: 44px; height: 44px; margin-bottom: 1.1rem; }
+    .scallop-divider { margin: 1.1rem 0 1.4rem; }
+    .tagline { margin-bottom: 1.75rem; }
+  }
+</style>
+</head>
+<body>
+  <main class="card">
+    <svg class="ornament" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <g stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M32 10c3.5 4 3.5 9 0 13-3.5-4-3.5-9 0-13z" fill="currentColor" fill-opacity="0.18"/>
+        <path d="M18 22c5-1.5 9 1 11 6-5 1.5-9-1-11-6z" fill="currentColor" fill-opacity="0.18"/>
+        <path d="M46 22c-5-1.5-9 1-11 6 5 1.5 9-1 11-6z" fill="currentColor" fill-opacity="0.18"/>
+        <path d="M32 28v20"/>
+        <path d="M32 34c-4 1-6 4-6 8M32 40c4 1 6 4 6 8"/>
+        <circle cx="32" cy="26" r="2.4" fill="currentColor"/>
+      </g>
+    </svg>
+
+    <h1 class="brand">Manelis <em>Studio</em></h1>
+
+    <div class="scallop-divider" role="presentation"></div>
+
+    <p class="eyebrow">Under Construction</p>
+    <p class="headline">Something delicate is being made ready.</p>
+    <p class="tagline">
+      We're stringing together a new home for <strong>necklaces, charms, chains &amp; bundles</strong>
+      designed to become tomorrow's heirlooms. Thank you for your patience while we set the table.
+    </p>
+
+    <p class="footnote">&mdash; Manelis Studio &mdash;</p>
+  </main>
+</body>
+</html>
