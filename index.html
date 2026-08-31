@@ -15,38 +15,20 @@
 -->
 <script src="locales/data.js"></script>
 <script>
-  // Synchronous boot: resolve the locale from the manifest already loaded
-  // above and set dir/pending before assets/i18n.js runs, so a returning or
-  // non-English-browser visitor never sees a flash of English.
+  // Synchronous boot: resolve the locale via the shared resolver in
+  // locales/data.js and set lang/dir/pending before assets/i18n.js runs, so
+  // a returning or non-English-browser visitor never sees a flash of
+  // English — either in rendered content or in the <html lang> metadata
+  // exposed to assistive tech and crawlers.
   (function () {
     var html = document.documentElement;
     try {
       var data = window.MANELIS_I18N;
       if (!data) return;
-      var codes = data.manifest.locales.map(function (l) { return l.code; });
-
-      var params = new URLSearchParams(window.location.search);
-      var requested = params.get('lang');
-      if (!requested || codes.indexOf(requested) === -1) {
-        requested = null;
-        try { requested = window.localStorage.getItem('manelis-lang'); } catch (e) { /* ignore */ }
-        if (!requested || codes.indexOf(requested) === -1) requested = null;
-      }
-      if (!requested) {
-        var browserLangs = navigator.languages || [navigator.language || ''];
-        for (var i = 0; i < browserLangs.length; i++) {
-          var short = String(browserLangs[i]).slice(0, 2).toLowerCase();
-          if (codes.indexOf(short) !== -1) { requested = short; break; }
-        }
-      }
-      if (!requested) requested = data.manifest.default;
-
-      var meta = null;
-      for (var j = 0; j < data.manifest.locales.length; j++) {
-        if (data.manifest.locales[j].code === requested) { meta = data.manifest.locales[j]; break; }
-      }
-      if (meta) html.setAttribute('dir', meta.dir || 'ltr');
-      if (requested === data.manifest.default) html.removeAttribute('data-i18n-pending');
+      var meta = data.resolveLocale();
+      html.setAttribute('lang', meta.code);
+      html.setAttribute('dir', meta.dir || 'ltr');
+      if (meta.code === data.manifest.default) html.removeAttribute('data-i18n-pending');
     } catch (e) {
       html.removeAttribute('data-i18n-pending');
     }

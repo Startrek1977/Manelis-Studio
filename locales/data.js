@@ -8,8 +8,14 @@
  *
  * To add a language: add one entry to MANIFEST.locales and one property to
  * BUNDLES below. No changes to index.html or assets/i18n.js are needed.
+ *
+ * resolveLocale()/localeMeta() live here (not in assets/i18n.js) so the
+ * synchronous boot script in index.html and the deferred assets/i18n.js can
+ * both call the exact same resolution logic instead of keeping two copies
+ * that could silently drift apart.
  */
 window.MANELIS_I18N = (function () {
+  var STORAGE_KEY = 'manelis-lang';
   var MANIFEST = {
     default: 'en',
     locales: [
@@ -106,5 +112,47 @@ window.MANELIS_I18N = (function () {
     }
   };
 
-  return { manifest: MANIFEST, bundles: BUNDLES };
+  function localeMeta(code) {
+    for (var i = 0; i < MANIFEST.locales.length; i++) {
+      if (MANIFEST.locales[i].code === code) return MANIFEST.locales[i];
+    }
+    return null;
+  }
+
+  /**
+   * Resolution order: ?lang= query param -> localStorage -> browser
+   * navigator.languages -> the manifest's declared default. Always returns
+   * a valid locale entry (falls back to the default locale's own entry).
+   */
+  function resolveLocale() {
+    var codes = MANIFEST.locales.map(function (l) { return l.code; });
+
+    var params = new URLSearchParams(window.location.search);
+    var fromQuery = params.get('lang');
+    if (fromQuery && codes.indexOf(fromQuery) !== -1) return localeMeta(fromQuery);
+
+    var fromStorage = null;
+    try {
+      fromStorage = window.localStorage.getItem(STORAGE_KEY);
+    } catch (e) {
+      /* localStorage unavailable (private mode, disabled) — ignore */
+    }
+    if (fromStorage && codes.indexOf(fromStorage) !== -1) return localeMeta(fromStorage);
+
+    var browserLangs = navigator.languages || [navigator.language || ''];
+    for (var i = 0; i < browserLangs.length; i++) {
+      var short = String(browserLangs[i]).slice(0, 2).toLowerCase();
+      if (codes.indexOf(short) !== -1) return localeMeta(short);
+    }
+
+    return localeMeta(MANIFEST.default);
+  }
+
+  return {
+    manifest: MANIFEST,
+    bundles: BUNDLES,
+    storageKey: STORAGE_KEY,
+    localeMeta: localeMeta,
+    resolveLocale: resolveLocale
+  };
 })();

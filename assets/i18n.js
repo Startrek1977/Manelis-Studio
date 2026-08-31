@@ -10,13 +10,14 @@
  * Adding a language requires NO changes to this file or to index.html: add
  * one manifest entry and one bundle to locales/data.js.
  *
- * Locale resolution order: ?lang= query param -> localStorage -> browser
- * navigator.languages -> the manifest's declared default.
+ * Locale resolution (?lang= -> localStorage -> navigator.languages -> the
+ * manifest default) lives in locales/data.js as resolveLocale()/localeMeta()
+ * so index.html's synchronous boot script and this file share one
+ * implementation instead of keeping it in sync by hand.
  */
 (function () {
   'use strict';
 
-  var STORAGE_KEY = 'manelis-lang';
   var htmlEl = document.documentElement;
 
   var data = window.MANELIS_I18N;
@@ -28,37 +29,8 @@
 
   var manifest = data.manifest;
   var bundles = data.bundles;
-
-  function localeMeta(code) {
-    for (var i = 0; i < manifest.locales.length; i++) {
-      if (manifest.locales[i].code === code) return manifest.locales[i];
-    }
-    return null;
-  }
-
-  function resolveRequestedLocale() {
-    var codes = manifest.locales.map(function (l) { return l.code; });
-
-    var params = new URLSearchParams(window.location.search);
-    var fromQuery = params.get('lang');
-    if (fromQuery && codes.indexOf(fromQuery) !== -1) return fromQuery;
-
-    var fromStorage = null;
-    try {
-      fromStorage = window.localStorage.getItem(STORAGE_KEY);
-    } catch (e) {
-      /* localStorage unavailable (private mode, disabled) — ignore */
-    }
-    if (fromStorage && codes.indexOf(fromStorage) !== -1) return fromStorage;
-
-    var browserLangs = navigator.languages || [navigator.language || ''];
-    for (var i = 0; i < browserLangs.length; i++) {
-      var short = String(browserLangs[i]).slice(0, 2).toLowerCase();
-      if (codes.indexOf(short) !== -1) return short;
-    }
-
-    return manifest.default;
-  }
+  var localeMeta = data.localeMeta;
+  var STORAGE_KEY = data.storageKey;
 
   function applyLocaleAttributes(meta) {
     htmlEl.setAttribute('lang', meta.code);
@@ -155,7 +127,13 @@
     container.innerHTML = '';
     manifest.locales.forEach(function (loc) {
       var link = document.createElement('a');
-      link.href = '?lang=' + loc.code;
+      // Preserve any existing query params/hash (not just replace the whole
+      // search string with "?lang=xx") so the link behaves the same as the
+      // click handler below if opened directly — e.g. in a new tab, or with
+      // JS unavailable.
+      var linkUrl = new URL(window.location.href);
+      linkUrl.searchParams.set('lang', loc.code);
+      link.href = linkUrl.toString();
       link.lang = loc.code;
       link.hreflang = loc.code;
 
@@ -227,5 +205,5 @@
     htmlEl.removeAttribute('data-i18n-pending');
   }
 
-  render(resolveRequestedLocale());
+  render(data.resolveLocale().code);
 })();
