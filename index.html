@@ -1,13 +1,58 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr" data-i18n-pending>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Manelis Studio — Coming Soon</title>
-<meta name="description" content="Manelis Studio is a jewelry atelier under construction — necklaces, charms, chains, and bundles made to become heirlooms. Coming soon.">
+<title data-i18n="title">Manelis Studio — Coming Soon</title>
+<meta name="description" data-i18n-attr="content:meta_description" content="Manelis Studio is a jewelry atelier under construction — necklaces, charms, chains, and bundles made to become heirlooms. Coming soon.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<!--
+  locales/data.js is a plain <script src>, not fetch()/JSON, so the page
+  localizes correctly whether opened as file:///.../index.html or served
+  over http(s) — browsers block fetch() on file:// but not script loading.
+-->
+<script src="locales/data.js"></script>
+<script>
+  // Synchronous boot: resolve the locale from the manifest already loaded
+  // above and set dir/pending before assets/i18n.js runs, so a returning or
+  // non-English-browser visitor never sees a flash of English.
+  (function () {
+    var html = document.documentElement;
+    try {
+      var data = window.MANELIS_I18N;
+      if (!data) return;
+      var codes = data.manifest.locales.map(function (l) { return l.code; });
+
+      var params = new URLSearchParams(window.location.search);
+      var requested = params.get('lang');
+      if (!requested || codes.indexOf(requested) === -1) {
+        requested = null;
+        try { requested = window.localStorage.getItem('manelis-lang'); } catch (e) { /* ignore */ }
+        if (!requested || codes.indexOf(requested) === -1) requested = null;
+      }
+      if (!requested) {
+        var browserLangs = navigator.languages || [navigator.language || ''];
+        for (var i = 0; i < browserLangs.length; i++) {
+          var short = String(browserLangs[i]).slice(0, 2).toLowerCase();
+          if (codes.indexOf(short) !== -1) { requested = short; break; }
+        }
+      }
+      if (!requested) requested = data.manifest.default;
+
+      var meta = null;
+      for (var j = 0; j < data.manifest.locales.length; j++) {
+        if (data.manifest.locales[j].code === requested) { meta = data.manifest.locales[j]; break; }
+      }
+      if (meta) html.setAttribute('dir', meta.dir || 'ltr');
+      if (requested === data.manifest.default) html.removeAttribute('data-i18n-pending');
+    } catch (e) {
+      html.removeAttribute('data-i18n-pending');
+    }
+  })();
+</script>
+<noscript><style>html[data-i18n-pending] .card { visibility: visible !important; }</style></noscript>
 <style>
   :root {
     --cream: #fbf6ef;
@@ -17,7 +62,11 @@
     --gold-soft: #cda863;
     --ink: #003D82;
     --ink-soft: #7a6f63;
+    --font-serif: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+    --font-sans: 'Jost', 'Segoe UI', Tahoma, Geneva, sans-serif;
   }
+
+  html[data-i18n-pending] .card { visibility: hidden; }
 
   * { box-sizing: border-box; }
 
@@ -28,7 +77,7 @@
   }
 
   body {
-    font-family: 'Jost', 'Segoe UI', Tahoma, Geneva, sans-serif;
+    font-family: var(--font-sans);
     color: var(--ink);
     background:
       radial-gradient(circle at 12% 15%, var(--sky-soft) 0%, transparent 45%),
@@ -60,7 +109,7 @@
   }
 
   .brand {
-    font-family: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+    font-family: var(--font-serif);
     font-weight: 600;
     font-size: clamp(2.4rem, 7vw, 4.2rem);
     letter-spacing: 0.02em;
@@ -86,7 +135,7 @@
   }
 
   .eyebrow {
-    font-family: 'Jost', sans-serif;
+    font-family: var(--font-sans);
     font-weight: 500;
     font-size: 0.78rem;
     letter-spacing: 0.32em;
@@ -96,7 +145,7 @@
   }
 
   .headline {
-    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-family: var(--font-serif);
     font-style: italic;
     font-weight: 500;
     font-size: clamp(1.35rem, 3.6vw, 1.85rem);
@@ -106,7 +155,7 @@
   }
 
   .tagline {
-    font-family: 'Jost', sans-serif;
+    font-family: var(--font-sans);
     font-weight: 300;
     font-size: clamp(0.95rem, 2.4vw, 1.05rem);
     color: var(--ink-soft);
@@ -121,7 +170,7 @@
   }
 
   .footnote {
-    font-family: 'Jost', sans-serif;
+    font-family: var(--font-sans);
     font-weight: 300;
     font-size: 0.8rem;
     letter-spacing: 0.06em;
@@ -129,11 +178,63 @@
     opacity: 0.75;
   }
 
+  .lang-switcher {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.4em 0.7em;
+    margin-top: 2rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid rgba(182, 137, 63, 0.25);
+    font-family: var(--font-sans);
+    font-size: 0.78rem;
+    letter-spacing: 0.02em;
+  }
+
+  .lang-switcher a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.42em;
+    color: var(--ink-soft);
+    text-decoration: none;
+    padding: 0.15em 0.1em;
+    border-bottom: 1px solid transparent;
+    transition: color 0.15s ease, border-color 0.15s ease;
+  }
+
+  .flag-icon {
+    display: inline-block;
+    flex: 0 0 auto;
+    width: 1.3em;
+    height: 0.87em;
+    border-radius: 2px;
+    overflow: hidden;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+  }
+
+  .flag-icon svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .lang-switcher a:hover,
+  .lang-switcher a:focus-visible {
+    color: var(--ink);
+  }
+
+  .lang-switcher a.is-active {
+    color: var(--gold);
+    font-weight: 500;
+    border-bottom-color: var(--gold-soft);
+  }
+
   @media (max-width: 420px) {
     body { padding: 8vh 6vw; }
     .ornament { width: 44px; height: 44px; margin-bottom: 1.1rem; }
     .scallop-divider { margin: 1.1rem 0 1.4rem; }
     .tagline { margin-bottom: 1.75rem; }
+    .lang-switcher { margin-top: 1.5rem; padding-top: 1rem; }
   }
 </style>
 </head>
@@ -154,14 +255,19 @@
 
     <div class="scallop-divider" role="presentation"></div>
 
-    <p class="eyebrow">Under Construction</p>
-    <p class="headline">Something delicate is being made ready.</p>
-    <p class="tagline">
+    <p class="eyebrow" data-i18n="eyebrow">Under Construction</p>
+    <p class="headline" data-i18n="headline">Something delicate is being made ready.</p>
+    <p class="tagline" data-i18n-slot="tagline" data-i18n-slot-highlight="tagline_highlight">
       We're stringing together a new home for <strong>necklaces, charms, chains &amp; bundles</strong>
       designed to become tomorrow's heirlooms. Thank you for your patience while we set the table.
     </p>
 
-    <p class="footnote">&mdash; Manelis Studio &mdash;</p>
+    <p class="footnote" dir="ltr">&mdash; Manelis Studio &mdash;</p>
+
+    <nav class="lang-switcher" data-i18n-switcher aria-label="Language"></nav>
   </main>
+
+  <script defer src="assets/flags.js"></script>
+  <script defer src="assets/i18n.js"></script>
 </body>
 </html>
